@@ -1,0 +1,6 @@
+{
+  "domain": "crafty",
+  "name": "Crafty Controller",
+  "config_flow": true,
+  "version": "0.1.0"
+}

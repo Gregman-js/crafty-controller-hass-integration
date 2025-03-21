@@ -1,0 +1,1 @@
+# Crafty Controller integration for Home Assistant
