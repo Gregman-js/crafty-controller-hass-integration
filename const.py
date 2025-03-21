@@ -13,3 +13,4 @@ ACTION_ENDPOINT = "https://127.0.0.1:8443/api/v2/servers/{server_id}/action/{act
 
 # Update interval (in seconds)
 UPDATE_INTERVAL = 30
+OPTIMISTIC_TIMEOUT = 30

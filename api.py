@@ -1,5 +1,7 @@
 import aiohttp
+import logging
 
+_LOGGER = logging.getLogger(__name__)
 
 class CraftyControllerAPI:
     def __init__(self, base_url, auth_token):
