@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import UPDATE_INTERVAL, CONF_BASE_URL, CONF_TOKEN, SERVERS_ENDPOINT
+from .const import UPDATE_INTERVAL, CONF_BASE_URL, CONF_TOKEN
 from .coordinator import CraftyDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)

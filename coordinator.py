@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import SERVERS_ENDPOINT, STATS_ENDPOINT, CONF_BASE_URL, CONF_TOKEN
+from .const import SERVERS_ENDPOINT, STATS_ENDPOINT
 
 _LOGGER = logging.getLogger(__name__)
 

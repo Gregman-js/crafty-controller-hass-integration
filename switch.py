@@ -4,7 +4,7 @@ import async_timeout
 
 from homeassistant.components.switch import SwitchEntity
 
-from .const import DOMAIN, ACTION_ENDPOINT, CONF_TOKEN, CONF_BASE_URL
+from .const import ACTION_ENDPOINT, CONF_TOKEN, CONF_BASE_URL
 
 _LOGGER = logging.getLogger(__name__)
 

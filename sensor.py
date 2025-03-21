@@ -1,8 +1,5 @@
 import logging
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import CONF_TOKEN
-
-from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
