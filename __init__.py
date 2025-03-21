@@ -1,49 +1,36 @@
-import logging
-from datetime import timedelta
-
-import async_timeout
-from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-
-from .const import UPDATE_INTERVAL, CONF_BASE_URL, CONF_TOKEN
-from .coordinator import CraftyDataUpdateCoordinator
-
-_LOGGER = logging.getLogger(__name__)
+from homeassistant.core import HomeAssistant
+from .const import DOMAIN, CONF_BASE_URL, CONF_TOKEN
+from .api import CraftyControllerAPI
+from .coordinator import CraftyServerCoordinator
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up crafty from a config entry."""
-    base_url = entry.data[CONF_BASE_URL]
-    token = entry.data[CONF_TOKEN]
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+    api = CraftyControllerAPI(entry.data[CONF_BASE_URL], entry.data[CONF_TOKEN])
+    servers = await api.get_servers()
+    coordinators = {}
+    for server in servers:
+        coordinator = CraftyServerCoordinator(hass, api, server["server_id"])
+        await coordinator.async_config_entry_first_refresh()
+        coordinators[server["server_id"]] = coordinator
 
-    coordinator = CraftyDataUpdateCoordinator(
-        hass,
-        base_url=base_url,
-        token=token,
-        update_interval=timedelta(seconds=UPDATE_INTERVAL),
-    )
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
+        "api": api,
+        "coordinators": coordinators,
+        "servers": servers
+    }
 
-    # Perform the first update to fetch the list of servers
-    await coordinator.async_config_entry_first_refresh()
-
-    hass.data.setdefault("crafty", {})[entry.entry_id] = coordinator
-
-    # Forward setup to platforms (sensor and switch)
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(entry, "sensor")
     )
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(entry, "switch")
     )
-
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload crafty config entry."""
-    unload_ok = await hass.config_entries.async_forward_entry_unload(entry, "sensor")
-    unload_ok &= await hass.config_entries.async_forward_entry_unload(entry, "switch")
-    if unload_ok:
-        hass.data["crafty"].pop(entry.entry_id)
-    return unload_ok
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    await hass.config_entries.async_unload_platforms(entry, ["sensor", "switch"])
+    data = hass.data[DOMAIN].pop(entry.entry_id)
+    await data["api"].close()
+    return True
