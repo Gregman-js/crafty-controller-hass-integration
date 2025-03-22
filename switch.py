@@ -1,8 +1,10 @@
+import logging
 from time import time
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .device_info_factory import create_device_info
@@ -14,8 +16,10 @@ from .const import (
     CONF_PANEL_URL,
 )
 
+_LOGGER = logging.getLogger(__name__)
 
-class CraftyServerSwitch(CoordinatorEntity, SwitchEntity):
+
+class CraftyServerSwitch(CoordinatorEntity, RestoreEntity, SwitchEntity):
     def __init__(
         self, coordinator, api, server_id: str, server_name: str, panel_url: str
     ):
@@ -35,8 +39,18 @@ class CraftyServerSwitch(CoordinatorEntity, SwitchEntity):
         """Return the device info."""
         return create_device_info(self.server_id, self.server_name, self.panel_url)
 
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+        last_state = await self.async_get_last_state()
+        if last_state is not None and last_state.attributes:
+            self._attr_entity_picture = last_state.attributes.get("entity_picture")
+
     @property
     def is_on(self) -> bool:
+        base64_icon = self.coordinator.data.get("icon")
+        if base64_icon:
+            self._attr_entity_picture = f"data:image/png;base64,{base64_icon}"
+
         if self._optimistic_state is not None:
             state, expires_at = self._optimistic_state
             if time() < expires_at:

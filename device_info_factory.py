@@ -12,3 +12,10 @@ def create_device_info(server_id: str, server_name: str, panel_url: str) -> Devi
         model=server_name,
         serial_number=server_id,
     )
+
+
+def create_minimal_device_info(server_id: str) -> DeviceInfo:
+    """Factory function to create minimal device info for a Crafty server."""
+    return DeviceInfo(
+        identifiers={(DOMAIN, server_id)},
+    )
