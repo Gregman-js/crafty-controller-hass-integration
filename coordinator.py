@@ -2,6 +2,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from datetime import timedelta
 import logging
 
+from const import UPDATE_INTERVAL
+
 _LOGGER = logging.getLogger(__name__)
 
 class CraftyServerCoordinator(DataUpdateCoordinator):
@@ -10,7 +12,7 @@ class CraftyServerCoordinator(DataUpdateCoordinator):
             hass,
             logger=_LOGGER,
             name=f"Crafty Server {server_id}",
-            update_interval=timedelta(seconds=30)
+            update_interval=timedelta(seconds=UPDATE_INTERVAL)
         )
         self.api = api
         self.server_id = server_id

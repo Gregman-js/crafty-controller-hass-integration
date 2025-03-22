@@ -3,5 +3,10 @@
   "name": "Crafty Controller",
   "config_flow": true,
   "version": "0.1.0",
-  "requirements": ["aiohttp"]
+  "requirements": ["aiohttp"],
+  "codeowners": ["@Gregman-js"],
+  "documentation": "https://github.com/Gregman-js/crafty-controller-hass-integration",
+  "issue_tracker": "https://github.com/Gregman-js/crafty-controller-hass-integration/issues",
+  "integration_type": "hub",
+  "iot_class": "local_polling"
 }

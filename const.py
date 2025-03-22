@@ -6,11 +6,19 @@ DOMAIN = "crafty"
 CONF_BASE_URL = "base_url"
 CONF_TOKEN = "token"
 
-# Endpoints
-SERVERS_ENDPOINT = "/api/v2/servers"
-STATS_ENDPOINT = "/api/v2/servers/{server_id}/stats"
-ACTION_ENDPOINT = "https://127.0.0.1:8443/api/v2/servers/{server_id}/action/{action}"
+# Endpoint paths
+PATH_API_BASE = "/api/v2"
+PATH_SERVERS = "/servers"
+PATH_STATS = "/servers/{server_id}/stats"
+PATH_ACTION = "/servers/{server_id}/action/{action}"
 
 # Update interval (in seconds)
 UPDATE_INTERVAL = 30
 OPTIMISTIC_TIMEOUT = 30
+
+# REST FIELDS
+API_SERVER_ID = "server_id"
+API_SERVER_NAME = "server_name"
+API_DATA = "data"
+API_STATUS = "status"
+API_STATUS_OK = "ok"

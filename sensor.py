@@ -1,7 +1,7 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, API_SERVER_ID, API_SERVER_NAME
 import logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,6 +24,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
     data = hass.data[DOMAIN][entry.entry_id]
     sensors = []
     for server in data["servers"]:
-        coordinator = data["coordinators"][server["server_id"]]
-        sensors.append(CraftyPlayersSensor(coordinator, server["server_id"], server["server_name"]))
+        coordinator = data["coordinators"][server[API_SERVER_ID]]
+        sensors.append(CraftyPlayersSensor(coordinator, server[API_SERVER_ID], server[API_SERVER_NAME]))
     async_add_entities(sensors)
