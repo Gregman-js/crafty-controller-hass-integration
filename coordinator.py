@@ -6,13 +6,14 @@ from const import UPDATE_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class CraftyServerCoordinator(DataUpdateCoordinator):
     def __init__(self, hass, api, server_id):
         super().__init__(
             hass,
             logger=_LOGGER,
             name=f"Crafty Server {server_id}",
-            update_interval=timedelta(seconds=UPDATE_INTERVAL)
+            update_interval=timedelta(seconds=UPDATE_INTERVAL),
         )
         self.api = api
         self.server_id = server_id

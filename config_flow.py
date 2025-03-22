@@ -7,10 +7,13 @@ from .const import DOMAIN, CONF_BASE_URL, CONF_TOKEN
 
 _LOGGER = logging.getLogger(__name__)
 
-DATA_SCHEMA = vol.Schema({
-    vol.Required(CONF_BASE_URL): str,
-    vol.Required(CONF_TOKEN): str,
-})
+DATA_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_BASE_URL): str,
+        vol.Required(CONF_TOKEN): str,
+    }
+)
+
 
 class CraftyConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Crafty integration."""
@@ -22,11 +25,13 @@ class CraftyConfigFlow(ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             config = {
-                CONF_BASE_URL: user_input[CONF_BASE_URL].rstrip('/'),
+                CONF_BASE_URL: user_input[CONF_BASE_URL].rstrip("/"),
                 CONF_TOKEN: user_input[CONF_TOKEN],
             }
             try:
-                await CraftyControllerAPI(config[CONF_BASE_URL], config[CONF_TOKEN]).validateController()
+                await CraftyControllerAPI(
+                    config[CONF_BASE_URL], config[CONF_TOKEN]
+                ).validateController()
             except Exception as err:
                 _LOGGER.error("Error validating crafty server: %s", err)
                 errors["base"] = "cannot_connect"

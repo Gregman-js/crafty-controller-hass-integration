@@ -6,6 +6,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, OPTIMISTIC_TIMEOUT, API_SERVER_ID, API_SERVER_NAME
 
+
 class CraftyServerSwitch(CoordinatorEntity, SwitchEntity):
     def __init__(self, coordinator, api, server_id, server_name):
         super().__init__(coordinator)
@@ -42,12 +43,15 @@ class CraftyServerSwitch(CoordinatorEntity, SwitchEntity):
         self._optimistic_state = (state, time() + OPTIMISTIC_TIMEOUT)
         self.async_write_ha_state()
 
+
 async def async_setup_entry(hass, entry, async_add_entities):
     data = hass.data[DOMAIN][entry.entry_id]
     switches = []
     for server in data["servers"]:
         coordinator = data["coordinators"][server[API_SERVER_ID]]
-        switches.append(CraftyServerSwitch(
-            coordinator, data["api"], server[API_SERVER_ID], server[API_SERVER_NAME]
-        ))
+        switches.append(
+            CraftyServerSwitch(
+                coordinator, data["api"], server[API_SERVER_ID], server[API_SERVER_NAME]
+            )
+        )
     async_add_entities(switches)

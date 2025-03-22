@@ -1,9 +1,18 @@
 import aiohttp
 import logging
 
-from const import API_DATA, API_STATUS, API_STATUS_OK, PATH_API_BASE, PATH_SERVERS, PATH_STATS, PATH_ACTION
+from const import (
+    API_DATA,
+    API_STATUS,
+    API_STATUS_OK,
+    PATH_API_BASE,
+    PATH_SERVERS,
+    PATH_STATS,
+    PATH_ACTION,
+)
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class CraftyControllerAPI:
     def __init__(self, base_url, auth_token):
@@ -12,7 +21,7 @@ class CraftyControllerAPI:
         self.session = aiohttp.ClientSession(
             base_url=f"{base_url}{PATH_API_BASE}",
             headers={"Authorization": self.auth_token},
-            connector=aiohttp.TCPConnector(ssl=False)
+            connector=aiohttp.TCPConnector(ssl=False),
         )
 
     async def get_servers(self):
