@@ -3,13 +3,14 @@ import voluptuous as vol
 from .api import CraftyControllerAPI
 from homeassistant.config_entries import ConfigFlow
 
-from .const import DOMAIN, CONF_BASE_URL, CONF_TOKEN
+from .const import DOMAIN, CONF_BASE_URL, CONF_TOKEN, CONF_PANEL_URL
 
 _LOGGER = logging.getLogger(__name__)
 
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_BASE_URL): str,
+        vol.Required(CONF_PANEL_URL): str,
         vol.Required(CONF_TOKEN): str,
     }
 )
@@ -26,6 +27,7 @@ class CraftyConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             config = {
                 CONF_BASE_URL: user_input[CONF_BASE_URL].rstrip("/"),
+                CONF_PANEL_URL: user_input[CONF_PANEL_URL].rstrip("/"),
                 CONF_TOKEN: user_input[CONF_TOKEN],
             }
             try:

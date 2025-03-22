@@ -6,15 +6,24 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .device_info_factory import create_device_info
-from .const import DOMAIN, OPTIMISTIC_TIMEOUT, API_SERVER_ID, API_SERVER_NAME
+from .const import (
+    DOMAIN,
+    OPTIMISTIC_TIMEOUT,
+    API_SERVER_ID,
+    API_SERVER_NAME,
+    CONF_PANEL_URL,
+)
 
 
 class CraftyServerSwitch(CoordinatorEntity, SwitchEntity):
-    def __init__(self, coordinator, api, server_id, server_name):
+    def __init__(
+        self, coordinator, api, server_id: str, server_name: str, panel_url: str
+    ):
         super().__init__(coordinator)
         self.api = api
         self.server_id = server_id
         self.server_name = server_name
+        self.panel_url = panel_url
         self._attr_name = server_name
         self._attr_icon = "mdi:minecraft"
         self._attr_unique_id = f"{server_id}_switch"
@@ -24,7 +33,7 @@ class CraftyServerSwitch(CoordinatorEntity, SwitchEntity):
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
-        return create_device_info(self.server_id, self.server_name)
+        return create_device_info(self.server_id, self.server_name, self.panel_url)
 
     @property
     def is_on(self) -> bool:
@@ -59,7 +68,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
         coordinator = data["coordinators"][server[API_SERVER_ID]]
         switches.append(
             CraftyServerSwitch(
-                coordinator, data["api"], server[API_SERVER_ID], server[API_SERVER_NAME]
+                coordinator,
+                data["api"],
+                server[API_SERVER_ID],
+                server[API_SERVER_NAME],
+                entry.data[CONF_PANEL_URL],
             )
         )
     async_add_entities(switches)

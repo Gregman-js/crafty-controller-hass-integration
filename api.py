@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class CraftyControllerAPI:
-    def __init__(self, base_url, auth_token):
+    def __init__(self, base_url: str, auth_token: str):
         self.session = aiohttp.ClientSession(
             base_url=f"{base_url}{PATH_API_BASE}",
             headers={"Authorization": auth_token},
@@ -28,13 +28,13 @@ class CraftyControllerAPI:
             data = await response.json()
             return data[API_DATA] if data[API_STATUS] == API_STATUS_OK else []
 
-    async def get_server_stats(self, server_id):
+    async def get_server_stats(self, server_id: str):
         async with self.session.get(PATH_STATS.format(server_id)) as response:
             response.raise_for_status()
             data = await response.json()
             return data[API_DATA] if data[API_STATUS] == API_STATUS_OK else {}
 
-    async def send_server_action(self, server_id, action):
+    async def send_server_action(self, server_id: str, action: str):
         async with self.session.post(PATH_ACTION.format(server_id, action)) as response:
             response.raise_for_status()
 

@@ -3,17 +3,18 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .device_info_factory import create_device_info
-from .const import DOMAIN, API_SERVER_ID, API_SERVER_NAME
+from .const import DOMAIN, API_SERVER_ID, API_SERVER_NAME, CONF_PANEL_URL
 import logging
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class CraftyPlayersSensor(CoordinatorEntity, SensorEntity):
-    def __init__(self, coordinator, server_id, server_name):
+    def __init__(self, coordinator, server_id, server_name, panel_url: str):
         super().__init__(coordinator)
         self.server_id = server_id
         self.server_name = server_name
+        self.panel_url = panel_url
         self._attr_name = f"{server_name} Players Online"
         self._attr_icon = "mdi:account-multiple"
         self._attr_unique_id = f"{server_id}_players"
@@ -22,7 +23,7 @@ class CraftyPlayersSensor(CoordinatorEntity, SensorEntity):
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
-        return create_device_info(self.server_id, self.server_name)
+        return create_device_info(self.server_id, self.server_name, self.panel_url)
 
     @property
     def native_value(self):
@@ -36,7 +37,10 @@ async def async_setup_entry(hass, entry, async_add_entities):
         coordinator = data["coordinators"][server[API_SERVER_ID]]
         sensors.append(
             CraftyPlayersSensor(
-                coordinator, server[API_SERVER_ID], server[API_SERVER_NAME]
+                coordinator,
+                server[API_SERVER_ID],
+                server[API_SERVER_NAME],
+                entry.data[CONF_PANEL_URL],
             )
         )
     async_add_entities(sensors)

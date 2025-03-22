@@ -4,6 +4,7 @@ DOMAIN = "crafty"
 
 # Configuration keys
 CONF_BASE_URL = "base_url"
+CONF_PANEL_URL = "panel_url"
 CONF_TOKEN = "token"
 
 # Endpoint paths
@@ -11,6 +12,9 @@ PATH_API_BASE = "/api/v2/"
 PATH_SERVERS = "servers"
 PATH_STATS = "servers/{}/stats"
 PATH_ACTION = "servers/{}/action/{}"
+
+# Crafty Controller Panel
+PANEL_SERVER_DETAILS = "/panel/server_detail?id={}"
 
 # Update interval (in seconds)
 UPDATE_INTERVAL = 30
