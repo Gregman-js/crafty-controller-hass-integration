@@ -7,10 +7,10 @@ CONF_BASE_URL = "base_url"
 CONF_TOKEN = "token"
 
 # Endpoint paths
-PATH_API_BASE = "/api/v2"
-PATH_SERVERS = "/servers"
-PATH_STATS = "/servers/{server_id}/stats"
-PATH_ACTION = "/servers/{server_id}/action/{action}"
+PATH_API_BASE = "/api/v2/"
+PATH_SERVERS = "servers"
+PATH_STATS = "servers/{}/stats"
+PATH_ACTION = "servers/{}/action/{}"
 
 # Update interval (in seconds)
 UPDATE_INTERVAL = 30

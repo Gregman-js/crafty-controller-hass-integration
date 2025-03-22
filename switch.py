@@ -2,8 +2,10 @@ from time import time
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .device_info_factory import create_device_info
 from .const import DOMAIN, OPTIMISTIC_TIMEOUT, API_SERVER_ID, API_SERVER_NAME
 
 
@@ -12,11 +14,17 @@ class CraftyServerSwitch(CoordinatorEntity, SwitchEntity):
         super().__init__(coordinator)
         self.api = api
         self.server_id = server_id
+        self.server_name = server_name
         self._attr_name = server_name
         self._attr_icon = "mdi:minecraft"
         self._attr_unique_id = f"{server_id}_switch"
         self._attr_device_info = {"identifiers": {(DOMAIN, server_id)}}
         self._optimistic_state = None
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return create_device_info(self.server_id, self.server_name)
 
     @property
     def is_on(self) -> bool:

@@ -1,7 +1,7 @@
 import aiohttp
 import logging
 
-from const import (
+from .const import (
     API_DATA,
     API_STATUS,
     API_STATUS_OK,
@@ -16,11 +16,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class CraftyControllerAPI:
     def __init__(self, base_url, auth_token):
-        self.base_url = base_url
-        self.auth_token = auth_token
         self.session = aiohttp.ClientSession(
             base_url=f"{base_url}{PATH_API_BASE}",
-            headers={"Authorization": self.auth_token},
+            headers={"Authorization": auth_token},
             connector=aiohttp.TCPConnector(ssl=False),
         )
 

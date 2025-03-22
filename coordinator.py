@@ -1,8 +1,7 @@
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from datetime import timedelta
 import logging
-
-from const import UPDATE_INTERVAL
+from .const import UPDATE_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
