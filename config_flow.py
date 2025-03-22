@@ -31,9 +31,9 @@ class CraftyConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_TOKEN: user_input[CONF_TOKEN],
             }
             try:
-                await CraftyControllerAPI(
-                    config[CONF_BASE_URL], config[CONF_TOKEN]
-                ).validateController()
+                api = CraftyControllerAPI(config[CONF_BASE_URL], config[CONF_TOKEN])
+                await api.validateController()
+                await api.close()
             except Exception as err:
                 _LOGGER.error("Error validating crafty server: %s", err)
                 errors["base"] = "cannot_connect"
