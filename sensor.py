@@ -1,77 +1,106 @@
-from homeassistant.components.sensor import SensorEntity, RestoreSensor
-from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from typing_extensions import TypeVar
 
-from .device_info_factory import create_device_info, create_minimal_device_info
+from homeassistant.components.sensor import SensorEntity, RestoreSensor
+from homeassistant.core import callback
+
+from .entity import MinecraftServerEntity
 from .const import DOMAIN, API_SERVER_ID, API_SERVER_NAME, CONF_PANEL_URL
 import logging
+from .coordinator import CraftyServerCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class CraftyPlayersSensor(CoordinatorEntity, SensorEntity):
-    def __init__(self, coordinator, server_id: str, server_name: str):
-        super().__init__(coordinator)
-        self.server_id = server_id
-        self._attr_name = f"{server_name} Players Online"
-        self._attr_icon = "mdi:account-multiple"
+class CraftyPlayersSensor(MinecraftServerEntity, SensorEntity):
+    _attr_should_poll = False
+    _attr_name = "Players Online"
+    _attr_icon = "mdi:account-multiple"
+
+    def __init__(
+        self,
+        coordinator: CraftyServerCoordinator,
+        server_id: str,
+        server_name: str,
+        panel_url: str,
+    ):
+        super().__init__(coordinator, server_id, server_name, panel_url)
         self._attr_unique_id = f"{server_id}_players"
+        self._update_data()
 
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return the device info."""
-        return create_minimal_device_info(self.server_id)
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        self._update_data(True)
 
-    @property
-    def native_value(self):
-        return self.coordinator.data.get("online", 0)
+    def _update_data(self, write=False):
+        self._attr_native_value = self.getData().online
+        if write:
+            self.async_write_ha_state()
 
 
-class CraftyPortSensor(CoordinatorEntity, RestoreSensor):
-    def __init__(self, coordinator, server_id: str, server_name: str):
-        super().__init__(coordinator)
-        self.server_id = server_id
-        self._attr_name = f"{server_name} Port"
-        self._attr_icon = "mdi:ethernet"
+class CraftyPortSensor(MinecraftServerEntity, RestoreSensor):
+    _attr_should_poll = False
+    _attr_name = "Port"
+    _attr_icon = "mdi:ethernet"
+
+    def __init__(
+        self,
+        coordinator: CraftyServerCoordinator,
+        server_id: str,
+        server_name: str,
+        panel_url: str,
+    ):
+        super().__init__(coordinator, server_id, server_name, panel_url)
         self._attr_unique_id = f"{server_id}_port"
+        self._update_data()
 
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return the device info."""
-        return create_minimal_device_info(self.server_id)
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        self._update_data(True)
 
-    @property
-    def native_value(self):
-        return str(self.coordinator.data.get("server_port"))
+    def _update_data(self, write=False):
+        self._attr_native_value = str(self.getData().server_port)
+        if write:
+            self.async_write_ha_state()
 
 
-class CraftyVersionSensor(CoordinatorEntity, RestoreSensor):
-    def __init__(self, coordinator, server_id: str, server_name: str):
-        super().__init__(coordinator)
-        self.server_id = server_id
-        self._attr_name = f"{server_name} Version"
-        self._attr_icon = "mdi:ethernet"
+class CraftyVersionSensor(MinecraftServerEntity, RestoreSensor):
+    _attr_should_poll = False
+    _attr_name = "Version"
+    _attr_icon = "mdi:ethernet"
+
+    def __init__(
+        self,
+        coordinator: CraftyServerCoordinator,
+        server_id: str,
+        server_name: str,
+        panel_url: str,
+    ):
+        super().__init__(coordinator, server_id, server_name, panel_url)
         self._attr_unique_id = f"{server_id}_version"
-        self._last_valid_value = None
+        self._update_data()
 
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return the device info."""
-        return create_minimal_device_info(self.server_id)
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        self._update_data(True)
 
-    @property
-    def native_value(self):
-        value = self.coordinator.data.get("version")
+    def _update_data(self, write=False) -> None:
+        value = self.getData().version
         if value not in (None, "", "False", False):
-            self._last_valid_value = value
-
-        return self._last_valid_value
+            self._attr_native_value = value
+            if write:
+                self.async_write_ha_state()
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
+
         last_sensor_data = await self.async_get_last_sensor_data()
         if last_sensor_data is not None:
-            self._last_valid_value = last_sensor_data.native_value
+            self._attr_native_value = last_sensor_data.native_value
+
+        self._update_data(True)
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -84,6 +113,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 coordinator,
                 server[API_SERVER_ID],
                 server[API_SERVER_NAME],
+                entry.data[CONF_PANEL_URL],
             )
         )
         sensors.append(
@@ -91,6 +121,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 coordinator,
                 server[API_SERVER_ID],
                 server[API_SERVER_NAME],
+                entry.data[CONF_PANEL_URL],
             )
         )
         sensors.append(
@@ -98,6 +129,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 coordinator,
                 server[API_SERVER_ID],
                 server[API_SERVER_NAME],
+                entry.data[CONF_PANEL_URL],
             )
         )
     async_add_entities(sensors)

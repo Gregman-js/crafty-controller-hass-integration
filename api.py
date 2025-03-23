@@ -1,6 +1,7 @@
 import aiohttp
 import logging
 
+from .types import CraftyServerStats
 from .const import (
     API_DATA,
     API_STATUS,
@@ -28,11 +29,14 @@ class CraftyControllerAPI:
             data = await response.json()
             return data[API_DATA] if data[API_STATUS] == API_STATUS_OK else []
 
-    async def get_server_stats(self, server_id: str):
+    async def get_server_stats(self, server_id: str) -> CraftyServerStats:
         async with self.session.get(PATH_STATS.format(server_id)) as response:
             response.raise_for_status()
             data = await response.json()
-            return data[API_DATA] if data[API_STATUS] == API_STATUS_OK else {}
+            if data[API_STATUS] != API_STATUS_OK:
+                raise Exception("Crafty returned error status")
+
+            return CraftyServerStats.from_dict(data[API_DATA])
 
     async def send_server_action(self, server_id: str, action: str):
         async with self.session.post(PATH_ACTION.format(server_id, action)) as response:

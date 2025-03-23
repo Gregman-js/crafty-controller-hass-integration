@@ -30,15 +30,16 @@ class CraftyConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_PANEL_URL: user_input[CONF_PANEL_URL].rstrip("/"),
                 CONF_TOKEN: user_input[CONF_TOKEN],
             }
+            api = CraftyControllerAPI(config[CONF_BASE_URL], config[CONF_TOKEN])
             try:
-                api = CraftyControllerAPI(config[CONF_BASE_URL], config[CONF_TOKEN])
                 await api.validateController()
-                await api.close()
             except Exception as err:
                 _LOGGER.error("Error validating crafty server: %s", err)
                 errors["base"] = "cannot_connect"
             else:
                 return self.async_create_entry(title="Crafty Controller", data=config)
+            finally:
+                await api.close()
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors

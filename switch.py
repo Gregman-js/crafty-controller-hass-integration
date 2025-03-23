@@ -3,11 +3,10 @@ from time import time
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.core import callback
 from homeassistant.helpers.restore_state import RestoreEntity
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .device_info_factory import create_device_info
+from .entity import MinecraftServerEntity
 from .const import (
     DOMAIN,
     OPTIMISTIC_TIMEOUT,
@@ -15,63 +14,72 @@ from .const import (
     API_SERVER_NAME,
     CONF_PANEL_URL,
 )
+from .coordinator import CraftyServerCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class CraftyServerSwitch(CoordinatorEntity, RestoreEntity, SwitchEntity):
-    def __init__(
-        self, coordinator, api, server_id: str, server_name: str, panel_url: str
-    ):
-        super().__init__(coordinator)
-        self.api = api
-        self.server_id = server_id
-        self.server_name = server_name
-        self.panel_url = panel_url
-        self._attr_name = server_name
-        self._attr_icon = "mdi:minecraft"
-        self._attr_unique_id = f"{server_id}_switch"
-        self._attr_device_info = {"identifiers": {(DOMAIN, server_id)}}
-        self._optimistic_state = None
+class CraftyServerSwitch(MinecraftServerEntity, RestoreEntity, SwitchEntity):
+    _attr_icon = "mdi:minecraft"
+    _attr_name = None
 
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return the device info."""
-        return create_device_info(self.server_id, self.server_name, self.panel_url)
+    def __init__(
+        self,
+        coordinator: CraftyServerCoordinator,
+        server_id: str,
+        server_name: str,
+        panel_url: str,
+    ):
+        super().__init__(coordinator, server_id, server_name, panel_url)
+        self.server_id = server_id
+        self._attr_unique_id = f"{server_id}_switch"
+        self._optimistic_state = None
+        self._update_data()
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
         last_state = await self.async_get_last_state()
-        if last_state is not None and last_state.attributes:
-            self._attr_entity_picture = last_state.attributes.get("entity_picture")
+        if last_state is not None:
+            self._attr_is_on = last_state.state == "on"
+            if last_state.attributes:
+                self._attr_entity_picture = last_state.attributes.get("entity_picture")
 
-    @property
-    def is_on(self) -> bool:
-        base64_icon = self.coordinator.data.get("icon")
-        if base64_icon:
-            self._attr_entity_picture = f"data:image/png;base64,{base64_icon}"
+        self._update_data(True)
 
+    def _update_data(self, write=False):
         if self._optimistic_state is not None:
             state, expires_at = self._optimistic_state
             if time() < expires_at:
-                return state
+                return
             else:
                 self._optimistic_state = None
 
-        return self.coordinator.data.get("running", False)
+        self._attr_is_on = self.getData().running
+        if write:
+            self.async_write_ha_state()
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        base64_icon = self.getData().icon
+        if base64_icon:
+            self._attr_entity_picture = f"data:image/png;base64,{base64_icon}"
+
+        self._update_data(True)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        await self.api.send_server_action(self.server_id, "start_server")
+        await self.coordinator.api.send_server_action(self.server_id, "start_server")
         self._set_optimistic_state(True)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        await self.api.send_server_action(self.server_id, "stop_server")
+        await self.coordinator.api.send_server_action(self.server_id, "stop_server")
         self._set_optimistic_state(False)
         await self.coordinator.async_request_refresh()
 
     def _set_optimistic_state(self, state: bool) -> None:
         self._optimistic_state = (state, time() + OPTIMISTIC_TIMEOUT)
+        self._attr_is_on = state
         self.async_write_ha_state()
 
 
@@ -83,7 +91,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
         switches.append(
             CraftyServerSwitch(
                 coordinator,
-                data["api"],
                 server[API_SERVER_ID],
                 server[API_SERVER_NAME],
                 entry.data[CONF_PANEL_URL],

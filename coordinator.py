@@ -1,6 +1,8 @@
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from datetime import timedelta
 import logging
+
+from .types import CraftyServerStats
 from .const import UPDATE_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
@@ -17,5 +19,5 @@ class CraftyServerCoordinator(DataUpdateCoordinator):
         self.api = api
         self.server_id = server_id
 
-    async def _async_update_data(self):
+    async def _async_update_data(self) -> CraftyServerStats:
         return await self.api.get_server_stats(self.server_id)
