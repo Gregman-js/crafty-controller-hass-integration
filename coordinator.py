@@ -21,3 +21,6 @@ class CraftyServerCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> CraftyServerStats:
         return await self.api.get_server_stats(self.server_id)
+
+    async def sendServerAction(self, action: str) -> CraftyServerStats:
+        return await self.api.send_server_action(self.server_id, action)

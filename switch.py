@@ -31,7 +31,6 @@ class CraftyServerSwitch(MinecraftServerEntity, RestoreEntity, SwitchEntity):
         panel_url: str,
     ):
         super().__init__(coordinator, server_id, server_name, panel_url)
-        self.server_id = server_id
         self._attr_unique_id = f"{server_id}_switch"
         self._optimistic_state = None
         self._update_data()
@@ -68,12 +67,12 @@ class CraftyServerSwitch(MinecraftServerEntity, RestoreEntity, SwitchEntity):
         self._update_data(True)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        await self.coordinator.api.send_server_action(self.server_id, "start_server")
+        await self.coordinator.sendServerAction("start_server")
         self._set_optimistic_state(True)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        await self.coordinator.api.send_server_action(self.server_id, "stop_server")
+        await self.coordinator.sendServerAction("stop_server")
         self._set_optimistic_state(False)
         await self.coordinator.async_request_refresh()
 

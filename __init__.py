@@ -15,7 +15,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         coordinators[server[API_SERVER_ID]] = coordinator
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
-        "api": api,
         "coordinators": coordinators,
         "servers": servers,
     }
