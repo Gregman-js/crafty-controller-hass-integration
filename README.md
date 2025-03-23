@@ -6,7 +6,7 @@ Remember to replace `$(pwd)` with this project absolute path
 ```json
 {
   "mounts": [
-    "source=$(pwd),target=/workspaces/ha-core/config/custom_components/crafty_controller,type=bind,consistency=cached"
+    "source=$(pwd)/custom_components/crafty_controller,target=/workspaces/ha-core/config/custom_components/crafty_controller,type=bind,consistency=cached"
   ]
 }
 ```
