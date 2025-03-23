@@ -1,8 +1,11 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
+
 from .const import DOMAIN, CONF_BASE_URL, CONF_TOKEN, API_SERVER_ID
 from .api import CraftyControllerAPI
 from .coordinator import CraftyServerCoordinator
+from homeassistant.helpers.entity_registry import async_entries_for_device, async_get
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -27,5 +30,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     await hass.config_entries.async_unload_platforms(entry, ["sensor", "switch"])
     data = hass.data[DOMAIN].pop(entry.entry_id)
-    await data["api"].close()
+    for coordinator in data["coordinators"].values():
+        await coordinator.api.close()
+    return True
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: ConfigEntry, device: DeviceEntry
+) -> bool:
+    """Determine if a device can be removed from a config entry.
+
+    Returns True if no entities associated with the device belong to the config entry.
+    Otherwise, returns False to block removal.
+    """
+    entity_registry = async_get(hass)
+    entries = async_entries_for_device(entity_registry, device.id)
+
+    for entry in entries:
+        if entry.config_entry_id == config_entry.entry_id:
+            return False
+
     return True
