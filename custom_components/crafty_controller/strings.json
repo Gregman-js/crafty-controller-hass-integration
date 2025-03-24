@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "api_url": "API url",
+          "panel_url": "Panel url",
+          "token": "API token"
+        },
+        "data_description": {
+          "api_url": "The hostname or IP address of your Crafty controller server, optionally including the port.",
+          "panel_url": "The hostname or IP address of your Crafty controller panel. Used in \"visit\" button.",
+          "token": "Your crafty controller api token."
+        },
+        "title": "Link your Crafty Controller",
+        "description": "Set up your Crafty Controller instance to allow monitoring."
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Crafty Controller. Check logs."
+    }
+  }
+}

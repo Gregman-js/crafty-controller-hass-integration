@@ -16,9 +16,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class CraftyControllerAPI:
-    def __init__(self, base_url: str, auth_token: str):
+    def __init__(self, api_url: str, auth_token: str):
         self.session = aiohttp.ClientSession(
-            base_url=f"{base_url}{PATH_API_BASE}",
+            base_url=f"{api_url}{PATH_API_BASE}",
             headers={"Authorization": auth_token},
             connector=aiohttp.TCPConnector(ssl=False),
         )
@@ -34,7 +34,7 @@ class CraftyControllerAPI:
             response.raise_for_status()
             data = await response.json()
             if data[API_STATUS] != API_STATUS_OK:
-                raise Exception("Crafty returned error status")
+                raise Exception("Crafty controller returned error status")
 
             return CraftyServerStats.from_dict(data[API_DATA])
 
@@ -48,7 +48,7 @@ class CraftyControllerAPI:
     async def validateController(self):
         async with self.session.get("") as response:
             if response.status != 200:
-                raise Exception("Invalid response from crafty server")
+                raise Exception("Invalid response from crafty controller")
             data = await response.json()
             if data.get(API_STATUS) != API_STATUS_OK:
-                raise Exception("Crafty returned error status")
+                raise Exception("Crafty controller returned error status")

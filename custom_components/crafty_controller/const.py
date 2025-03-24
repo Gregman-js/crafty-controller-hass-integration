@@ -1,9 +1,9 @@
-"""Constants for the Crafty integration."""
+"""Constants for the Crafty Controller integration."""
 
-DOMAIN = "crafty"
+DOMAIN = "crafty_controller"
 
 # Configuration keys
-CONF_BASE_URL = "base_url"
+CONF_API_URL = "api_url"
 CONF_PANEL_URL = "panel_url"
 CONF_TOKEN = "token"
 

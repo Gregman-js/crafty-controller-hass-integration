@@ -13,7 +13,7 @@ class CraftyServerCoordinator(DataUpdateCoordinator):
         super().__init__(
             hass,
             logger=_LOGGER,
-            name=f"Crafty Server {server_id}",
+            name=f"Crafty Controller Server {server_id}",
             update_interval=timedelta(seconds=UPDATE_INTERVAL),
         )
         self.api = api

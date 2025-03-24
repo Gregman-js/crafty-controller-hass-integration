@@ -3,13 +3,13 @@ import voluptuous as vol
 from .api import CraftyControllerAPI
 from homeassistant.config_entries import ConfigFlow
 
-from .const import DOMAIN, CONF_BASE_URL, CONF_TOKEN, CONF_PANEL_URL
+from .const import DOMAIN, CONF_API_URL, CONF_TOKEN, CONF_PANEL_URL
 
 _LOGGER = logging.getLogger(__name__)
 
 DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_BASE_URL): str,
+        vol.Required(CONF_API_URL): str,
         vol.Required(CONF_PANEL_URL): str,
         vol.Required(CONF_TOKEN): str,
     }
@@ -17,7 +17,7 @@ DATA_SCHEMA = vol.Schema(
 
 
 class CraftyConfigFlow(ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Crafty integration."""
+    """Handle a config flow for Crafty Controller integration."""
 
     VERSION = 1
 
@@ -26,11 +26,11 @@ class CraftyConfigFlow(ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             config = {
-                CONF_BASE_URL: user_input[CONF_BASE_URL].rstrip("/"),
+                CONF_API_URL: user_input[CONF_API_URL].rstrip("/"),
                 CONF_PANEL_URL: user_input[CONF_PANEL_URL].rstrip("/"),
                 CONF_TOKEN: user_input[CONF_TOKEN],
             }
-            api = CraftyControllerAPI(config[CONF_BASE_URL], config[CONF_TOKEN])
+            api = CraftyControllerAPI(config[CONF_API_URL], config[CONF_TOKEN])
             try:
                 await api.validateController()
             except Exception as err:

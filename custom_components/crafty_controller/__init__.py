@@ -2,14 +2,14 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from .const import DOMAIN, CONF_BASE_URL, CONF_TOKEN, API_SERVER_ID
+from .const import DOMAIN, CONF_API_URL, CONF_TOKEN, API_SERVER_ID
 from .api import CraftyControllerAPI
 from .coordinator import CraftyServerCoordinator
 from homeassistant.helpers.entity_registry import async_entries_for_device, async_get
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    api = CraftyControllerAPI(entry.data[CONF_BASE_URL], entry.data[CONF_TOKEN])
+    api = CraftyControllerAPI(entry.data[CONF_API_URL], entry.data[CONF_TOKEN])
     servers = await api.get_servers()
     coordinators = {}
     for server in servers:
