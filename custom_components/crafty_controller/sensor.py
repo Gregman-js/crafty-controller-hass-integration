@@ -68,7 +68,7 @@ class CraftyPortSensor(MinecraftServerEntity, RestoreSensor):
 class CraftyVersionSensor(MinecraftServerEntity, RestoreSensor):
     _attr_should_poll = False
     _attr_name = "Version"
-    _attr_icon = "mdi:ethernet"
+    _attr_icon = "mdi:tune-vertical"
 
     def __init__(
         self,
